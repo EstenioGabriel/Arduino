@@ -1,4 +1,4 @@
-// Micro Servo 
+// Micro Servo
 #include <Servo.h>
 #define pinServo 12
 Servo servo;
@@ -18,7 +18,7 @@ int esquerda;
 // recebe a posicao como argumento
 // move o servo
 // espera meio segundo
-void moveServo(int posicao){
+void moveServo(int posicao) {
   servo.write(posicao);
   delay(500);
 }
@@ -30,7 +30,7 @@ void moveServo(int posicao){
 // atribui a distancia para a variavel esquerda
 // move o servo apontado para direita
 // atribue a distancia para a variavel direita
-void medeTodasAsDirecoes(){
+void medeTodasAsDirecoes() {
   moveServo(100);
   frente = distanciaAtual();
   moveServo(180);
@@ -44,22 +44,22 @@ void medeTodasAsDirecoes(){
 // triggerPin envia um pulso
 // echoPin recebe o reflexo do pulso
 // retorna echoPin
-long sensorUltrassonico(int tringgerPin, int echoPin){
+long sensorUltrassonico(int tringgerPin, int echoPin) {
   pinMode(tringgerPin, OUTPUT);
-  digitalWrite(tringgerPin,LOW);
+  digitalWrite(tringgerPin, LOW);
   delay(2);
   digitalWrite(tringgerPin, HIGH);
   delay(10);
   digitalWrite(tringgerPin, LOW);
   pinMode(echoPin, INPUT);
-  return pulseIn (echoPin, HIGH);
+  return pulseIn(echoPin, HIGH);
 }
 
-// Mede distancia atual 
-// trasforma echoPin para cm 
+// Mede distancia atual
+// trasforma echoPin para cm
 // atribui o valor para variavel atual
 // retorna variavel atual
-long distanciaAtual(){
+long distanciaAtual() {
   atual = 0.01723 * sensorUltrassonico(A0, A1);
   delay(100);
   return atual;
@@ -69,23 +69,22 @@ long distanciaAtual(){
 // Define o numero do motor para se movimentar para frente
 // recebe a distancia atual
 // para os motores
-void motorFrente(){
+void motorFrente() {
   analogWrite(motorEsquerdo2, 155);
-  analogWrite(motorEsquerdo1,0);
+  analogWrite(motorEsquerdo1, 0);
   analogWrite(motorDireito2, 155);
   analogWrite(motorDireito1, 0);
   frente = distanciaAtual();
   if (frente < 20) {
     pararMotores();
   }
-} 
+}
 
 // Configura o motor para seguir para esquerda
 // Define o numero do motor para se movimentar para esquerda
 // Para os motores
 // Chama a funcao para medir todas as direcoes
-// escolhe qual a melhor direcao
-long motorEsquerda(){
+void motorEsquerda() {
   analogWrite(motorEsquerdo2, 0);
   analogWrite(motorEsquerdo1, 0);
   analogWrite(motorDireito1, 0);
@@ -100,12 +99,11 @@ long motorEsquerda(){
 // Define o numero do motor para se movimentar para direita
 // para os motores
 // Chama a funcao para medir todas as direcoes
-// escolhe qual a melhor direcao 
-long motorDireita(){
+void motorDireita() {
   analogWrite(motorEsquerdo2, 155);
   analogWrite(motorEsquerdo1, 0);
   analogWrite(motorDireito1, 0);
-  analogWrite(motorDireito2, 0);   
+  analogWrite(motorDireito2, 0);
   delay(250);
   pararMotores();
   medeTodasAsDirecoes();
@@ -113,8 +111,8 @@ long motorDireita(){
 }
 
 // Configura o motor para parar
-// Define o numero de todos os motores para 0, parando todos 
-void pararMotores(){
+// Define o pwm de todos os motores para 0
+void pararMotores() {
   analogWrite(motorEsquerdo2, 0);
   analogWrite(motorEsquerdo1, 0);
   analogWrite(motorDireito1, 0);
@@ -124,20 +122,18 @@ void pararMotores(){
 // Função para escolher a direção
 // Laco que define qual das direcoes e a ideal
 void escolherDirecao(int frente, int esquerda, int direita) {
-  if ( frente > esquerda && frente > direita){
+  if (frente > esquerda && frente > direita) {
     motorFrente();
     Serial.println("Direção escolhida: Frente");
-  }
-  else if (esquerda > frente && esquerda > direita){
+  } else if (esquerda > frente && esquerda > direita) {
     motorEsquerda();
     Serial.println("Direção escolhida: Esquerda");
-  }
-  else if (direita > frente && direita > esquerda){
-    motorDireita();       
+  } else if (direita > frente && direita > esquerda) {
+    motorDireita();
     Serial.println("Direção escolhida: Direita");
   }
 }
-  
+
 // Define a comunicacao com o serial monitor
 // Define o servo para a porta
 void setup() {
@@ -147,7 +143,11 @@ void setup() {
   escolherDirecao(frente, esquerda, direita);
 }
 
-// Laco que define se a distancia atual, para os motores e mede todas as distancias, escolhe uma das direcoes
+// Sensor apontado para frete recebe a distancia atual
+// Se a distancia atual for menor que 20 cm
+// Os motores param
+// Função mede todas as direções
+// Função escolhe qual é a melhor direceção e faz ele andar para direção escolhida
 void loop() {
   frente = distanciaAtual();
   if (frente < 20) {
